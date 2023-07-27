@@ -32,9 +32,7 @@ struct PhotosView: View {
                 gridView
             }
         }
-        .onAppear {
-            viewModel.requestForPhotos()
-        }
+        .onAppear { viewModel.requestForPhotos() }
     }
 }
 
@@ -75,7 +73,16 @@ extension PhotosView {
                 }
             }
         }
-
+        .alert("Permission Required", isPresented: $viewModel.isPermissionDenied) {
+            Button("Cancel", role: .cancel) { }
+            Button("Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+        } message: {
+            Text("Please allow photos permission from settings.")
+        }
     }
 }
 

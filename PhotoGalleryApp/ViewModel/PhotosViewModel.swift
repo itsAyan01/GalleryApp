@@ -17,19 +17,24 @@ final class PhotosViewModel: ObservableObject {
     
     @Published var allPhotos: PHFetchResult<PHAsset>? = nil
     @Published var images = [UIImage]()
+    @Published var isPermissionDenied: Bool = false
     
     func requestForPhotos() {
         PHPhotoLibrary.requestAuthorization { status in
             switch status {
             case .authorized:
                 print("Good to proceed")
-                let fetchOptions = PHFetchOptions()
+                let _ = PHFetchOptions()
                 self.getPhotos()
             case .denied, .restricted:
+                DispatchQueue.main.async {
+                    self.isPermissionDenied = true                    
+                }
                 print("Not allowed")
             case .notDetermined:
                 print("Not determined yet")
             case .limited:
+                self.isPermissionDenied = true
                 print("Not determined yet")
             @unknown default:
                 print("Not determined yet")
@@ -37,8 +42,8 @@ final class PhotosViewModel: ObservableObject {
         }
     }
     
+    // fetch all phots from device storage
     fileprivate func getPhotos() {
-        
         let manager = PHImageManager.default()
         let requestOptions = PHImageRequestOptions()
         requestOptions.isSynchronous = false
@@ -63,6 +68,5 @@ final class PhotosViewModel: ObservableObject {
         } else {
             print("no photos to display")
         }
-        
     }
 }
