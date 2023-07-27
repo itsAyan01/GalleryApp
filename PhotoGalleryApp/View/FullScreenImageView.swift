@@ -15,14 +15,16 @@ struct FullScreenImageView: View {
     @Binding var showFullScreenView: Bool
     @State private var dragOffset = CGSize.zero
     @State private var scaleAmount: CGFloat = 0
+    @Namespace var selectedImageNamespace
     
     var body: some View {
         VStack {
             HStack {
                 Spacer()
                 
-                Text("X")
-                    .font(.largeTitle)
+                Image(systemName: "x.circle.fill")
+                    .font(.title)
+                    .foregroundColor(.gray)
                     .onTapGesture {
                         withAnimation {
                             showFullScreenView = false
@@ -78,18 +80,37 @@ struct FullScreenImageView: View {
                     }
             )
             
-            ScrollView(.horizontal) {
-                HStack {
-                    ForEach(Array(imgArray.enumerated()), id: \.offset) { index, image in
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .onTapGesture {
-                                withAnimation {
-                                    selectedImage = index
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(Array(imgArray.enumerated()), id: \.offset) { index, image in
+                            VStack {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 60)
+                                    .onTapGesture {
+                                        withAnimation {
+                                            selectedImage = index
+                                        }
+                                    }
+                                
+                                if selectedImage == index {
+                                    Rectangle()
+                                        .fill(Color.gray)
+                                        .frame(width: 80, height: 2)
+                                        .matchedGeometryEffect(id: "1", in: selectedImageNamespace)
                                 }
                             }
+                        }
+                    }
+                }
+                .onAppear {
+                    proxy.scrollTo(selectedImage, anchor: .leading)
+                }
+                .onChange(of: selectedImage) { newValue in
+                    withAnimation {
+                        proxy.scrollTo(newValue)
                     }
                 }
             }

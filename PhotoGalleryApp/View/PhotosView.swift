@@ -11,9 +11,9 @@ struct PhotosView: View {
     
     @StateObject var viewModel = PhotosViewModel()
     let column: [GridItem] = [
-        GridItem(.flexible(), spacing: nil, alignment: nil),
-        GridItem(.flexible(), spacing: nil, alignment: nil),
-        GridItem(.flexible(), spacing: nil, alignment: nil)
+        GridItem(.flexible(), spacing: 8, alignment: nil),
+        GridItem(.flexible(), spacing: 8, alignment: nil),
+        GridItem(.flexible(), spacing: 8, alignment: nil)
     ]
     @State var imgUrls: [ImageModel] = []
     @State var selectedImage: Int = 0
@@ -43,18 +43,20 @@ extension PhotosView {
     var gridView: some View {
         VStack {
             ScrollView {
-                LazyVGrid(columns: column) {
+                LazyVGrid(columns: column, spacing: 8) {
                     ForEach(Array(viewModel.images.enumerated()), id: \.offset) { index, image in
                         Image(uiImage: image)
                             .resizable()
-                            .scaledToFit()
+                            .scaledToFill()
                             .frame(height: 100)
+                            .frame(width: UIScreen.main.bounds.width / 3.1)
                             .onTapGesture {
                                 withAnimation {
                                     selectedImage = index
                                     showFullScreenView = true
                                 }
                             }
+                            .clipShape(Rectangle())
                             .matchedGeometryEffect(id: "scaleTo\(index)", in: namespace)
                             .contextMenu {
                                 Button {
